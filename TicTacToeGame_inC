@@ -1,0 +1,149 @@
+#include <stdio.h>
+
+void oyunTahtasiYazdir(char tahta[3][3]);
+int hamleYap(char tahta[3][3], int satir, int sutun, char oyuncu);
+int oyunDurumuKontrol(char tahta[3][3]);
+
+int main() {
+    char tahta[3][3] = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
+    int satir, sutun,numara;
+    char oyuncu = 'X';
+    int durum;
+
+    do {
+        // Oyun tahtasını göster
+        oyunTahtasiYazdir(tahta);
+
+        printf("Sira %c oyuncusunda. Bir numara secin: ", oyuncu);
+        scanf("%d", &numara);
+        if(numara>0 && numara <=9){
+        	if(numara == 1){
+        		satir = 1;
+        		sutun = 1;
+			}
+			else if(numara == 2){
+        		satir = 1;
+        		sutun = 2;
+			}
+			else if(numara == 3){
+        		satir = 1;
+        		sutun = 3;
+			}
+			else if(numara == 4){
+        		satir = 2;
+        		sutun = 1;
+			}
+			else if(numara == 5){
+        		satir = 2;
+        		sutun = 2;
+			}
+			else if(numara == 6){
+        		satir = 2;
+        		sutun = 3;
+			}
+			else if(numara == 7){
+        		satir = 3;
+        		sutun = 1;
+			}
+			else if(numara == 8){
+        		satir = 3;
+        		sutun = 2;
+			}
+			else if(numara == 9){
+        		satir = 3;
+        		sutun = 3;
+			}
+		}
+		else{
+			satir=4;
+			sutun=4;
+		}
+
+        // Hamleyi kontrol et
+        if (hamleYap(tahta, satir - 1, sutun - 1, oyuncu)) {
+            // Oyun durumunu kontrol et
+            durum = oyunDurumuKontrol(tahta);
+
+            // Oyun devam ediyorsa oyuncu değiştir
+            oyuncu = (oyuncu == 'X') ? 'O' : 'X';
+        } else {
+            printf("Gecersiz hamle! Lutfen tekrar deneyin.\n");
+        }
+
+    } while (durum == -1);
+
+    // Oyun sonucunu göster
+    oyunTahtasiYazdir(tahta);
+    if (durum == 1) {
+    	oyuncu = (oyuncu == 'X') ? 'O' : 'X';
+        printf("Oyunu kazanan: %c\n", oyuncu);
+    } else {
+        printf("Oyun berabere!\n");
+    }
+
+    return 0;
+}
+
+// Oyun tahtasını ekrana yazdıran fonksiyon
+void oyunTahtasiYazdir(char tahta[3][3]) {
+    printf("\nOyun Tahtasi:\n");
+    int i,j,sayac=1;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+        	if(tahta[i][j] == '\0' || tahta[i][j] == ' ' ){
+        		printf(" %c%d ", tahta[i][j],sayac);
+			}
+			else{
+            printf("  %c ", tahta[i][j]);
+        	}
+        	sayac++;
+			if(j<2){
+				printf("|");
+			}
+        }
+        printf("\n");
+        if(i<2){
+			printf("----+----+----\n");
+		}
+    }
+    printf("\n");
+}
+
+// Hamleyi kontrol eden fonksiyon
+int hamleYap(char tahta[3][3], int satir, int sutun, char oyuncu) {
+    if (satir >= 0 && satir < 3 && sutun >= 0 && sutun < 3 && tahta[satir][sutun] == ' ') {
+        tahta[satir][sutun] = oyuncu;
+        return 1; // Geçerli hamle yapıldı
+    } else {
+        return 0; // Geçersiz hamle
+    }
+}
+
+// Oyun durumunu kontrol eden fonksiyon
+int oyunDurumuKontrol(char tahta[3][3]) {
+    // Satır ve sütun kontrolü
+    int i;
+    for (i = 0; i < 3; i++) {
+        if (tahta[i][0] == tahta[i][1] && tahta[i][1] == tahta[i][2] && tahta[i][0] != ' ')
+            return 1; // Kazanan var
+        if (tahta[0][i] == tahta[1][i] && tahta[1][i] == tahta[2][i] && tahta[0][i] != ' ')
+            return 1; // Kazanan var
+    }
+
+    // Çapraz kontrol
+    if (tahta[0][0] == tahta[1][1] && tahta[1][1] == tahta[2][2] && tahta[0][0] != ' ')
+        return 1; // Kazanan var
+    if (tahta[0][2] == tahta[1][1] && tahta[1][1] == tahta[2][0] && tahta[0][2] != ' ')
+        return 1; // Kazanan var
+
+    // Berabere kontrolü
+    int j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            if (tahta[i][j] == ' ')
+                return -1; // Oyun devam ediyor
+        }
+    }
+
+    return 0; // Berabere
+}
